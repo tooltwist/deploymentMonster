@@ -7,19 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D417671F1D8A69450033A872 /* DockerPS.sh in Resources */ = {isa = PBXBuildFile; fileRef = D417671E1D8A69450033A872 /* DockerPS.sh */; };
+		D41767211D8A6BB00033A872 /* DockerPS.command in Resources */ = {isa = PBXBuildFile; fileRef = D41767201D8A6BB00033A872 /* DockerPS.command */; };
 		D481D3E11D893B4400B8523F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D481D3E01D893B4400B8523F /* AppDelegate.swift */; };
 		D481D3E31D893B4400B8523F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D481D3E21D893B4400B8523F /* ViewController.swift */; };
 		D481D3E51D893B4400B8523F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D481D3E41D893B4400B8523F /* Assets.xcassets */; };
 		D481D3E81D893B4400B8523F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D481D3E61D893B4400B8523F /* Main.storyboard */; };
+		D481D3F01D89692900B8523F /* Projects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D481D3EF1D89692900B8523F /* Projects.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D417671E1D8A69450033A872 /* DockerPS.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = DockerPS.sh; sourceTree = "<group>"; };
+		D41767201D8A6BB00033A872 /* DockerPS.command */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = DockerPS.command; sourceTree = "<group>"; };
 		D481D3DD1D893B4400B8523F /* deploymentMonster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = deploymentMonster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D481D3E01D893B4400B8523F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D481D3E21D893B4400B8523F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		D481D3E41D893B4400B8523F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D481D3E71D893B4400B8523F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D481D3E91D893B4400B8523F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D481D3EF1D89692900B8523F /* Projects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Projects.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +39,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D417671D1D8A69010033A872 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D417671E1D8A69450033A872 /* DockerPS.sh */,
+				D41767201D8A6BB00033A872 /* DockerPS.command */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		D481D3D41D893B4400B8523F = {
 			isa = PBXGroup;
 			children = (
@@ -57,6 +72,8 @@
 				D481D3E41D893B4400B8523F /* Assets.xcassets */,
 				D481D3E61D893B4400B8523F /* Main.storyboard */,
 				D481D3E91D893B4400B8523F /* Info.plist */,
+				D481D3EF1D89692900B8523F /* Projects.swift */,
+				D417671D1D8A69010033A872 /* Supporting Files */,
 			);
 			path = deploymentMonster;
 			sourceTree = "<group>";
@@ -119,7 +136,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D41767211D8A6BB00033A872 /* DockerPS.command in Resources */,
 				D481D3E51D893B4400B8523F /* Assets.xcassets in Resources */,
+				D417671F1D8A69450033A872 /* DockerPS.sh in Resources */,
 				D481D3E81D893B4400B8523F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -131,6 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D481D3F01D89692900B8523F /* Projects.swift in Sources */,
 				D481D3E31D893B4400B8523F /* ViewController.swift in Sources */,
 				D481D3E11D893B4400B8523F /* AppDelegate.swift in Sources */,
 			);
@@ -275,6 +295,7 @@
 				D481D3EE1D893B4400B8523F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
