@@ -36,13 +36,31 @@ class ViewController: NSViewController {
     
     
     var projects: [Project] = []
-    var currentProject: Project?
+    
+    // Current project
+    var currentProject: Project? {
+        didSet {
+            print("currentProject was changed")
+            showCurrentProject()
+        }
+    }
     
     // Related to Docker ps
     dynamic var psRunning = false
     var outputPipe:NSPipe!
     var buildTask:NSTask!
+    
+    
+    override var representedObject: AnyObject? {
+        didSet {
+            // Update the view, if already loaded.
+        }
+    }
 
+    
+    
+    
+// MARK: -
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +71,7 @@ class ViewController: NSViewController {
         projectTableView.setDataSource(self)
         
         // Set fixed spaced font for docker outputs
-        let font = NSFont(name: "Courier", size: 12)
+        let font = NSFont(name: "Courier", size: 11)
         devContainers.font = font
   
     }
@@ -71,17 +89,13 @@ class ViewController: NSViewController {
         }
     }
 
-
-    override var representedObject: AnyObject? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-    }
     
     
-    //--------------------------------------------------
-    //          Buttons to start terminals
-    //--------------------------------------------------
+    
+    
+// MARK: -
+// MARK: Start Terminals and Finder
+// MARK: -
 
     @IBAction func configsTerminalButton(sender: AnyObject) {
         //print("configsTerminalButton operation")
@@ -181,9 +195,9 @@ class ViewController: NSViewController {
 
 }
 
-//--------------------------------------------------
-//          Table of project names
-//--------------------------------------------------
+// MARK: -
+// MARK:         List of Projects UI
+// MARK: -
 
 extension ViewController : NSTableViewDataSource {
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
@@ -235,44 +249,63 @@ extension ViewController : NSTableViewDelegate {
             let index = projectTableView.selectedRowIndexes.firstIndex
             if index >= 0 && index <= projects.count {
                 currentProject = projects[index];
-                showCurrentProject()
+//                showCurrentProject()
             } else {
                 currentProject = nil
-                showCurrentProject()
+//                showCurrentProject()
             }
         }
     }
-    
-    
-    //--------------------------------------------------
-    //          CHANGING PROJECT HAPPENS HERE
-    //--------------------------------------------------
-    
+
+}
+
+
+
+// MARK: -
+// MARK:         Current project
+// MARK: -
+extension ViewController {
+
     func showCurrentProject() {
         print("showCurrentProject()")
         
-        if currentProject == nil {
-            return
+        var showDev = false
+        var showDockerize = false
+        var showTest = false
+        var showProjectTab = false
+        
+        if currentProject != nil {
+            print("Current project is \(currentProject!.name)")
+
+            showDev = currentProject!.dev
+            showDockerize = currentProject!.docker
+            showTest = currentProject!.test
+            
+            // See if the project directory exists
+            let projectDir = "/Development/projects/" + currentProject!.name
+            projectDirectoryMsg.stringValue = projectDir
+            var isDir : ObjCBool = false
+            let filemgr = NSFileManager.defaultManager()
+            if filemgr.fileExistsAtPath(projectDir, isDirectory:&isDir) {
+                if isDir {
+                    showProjectTab = true
+                }
+            }
         }
         
-        print("Current project is \(currentProject!.name)")
-
+        
         // Look after dev tab
-        if currentProject!.dev {
-//            devTab.label = "dev"
+        if showDev {
             devTerminalButton.enabled = true
             devFinderButton.enabled = true
         }
         else {
-//            let font = NSFont.messageFont(12)
-//            devTab.font
-//            devTab.label = "[dev]"
             devTerminalButton.enabled = false
             devFinderButton.enabled = false
         }
         
         // Look after dockerize tab
-        if currentProject!.docker {
+        if showDockerize {
             dockerizeTerminalButton.enabled = true
             dockerizeFinderButton.enabled = true
         }
@@ -282,7 +315,7 @@ extension ViewController : NSTableViewDelegate {
         }
         
         // Look after test tab
-        if currentProject!.test {
+        if showTest {
             testTerminalButton.enabled = true
             testFinderButton.enabled = true
         }
@@ -292,56 +325,30 @@ extension ViewController : NSTableViewDelegate {
         }
         
         // Look after project tab
-        let projectDir = "/Development/projects/" + currentProject!.name
-        projectDirectoryMsg.stringValue = projectDir
-        var isDir : ObjCBool = false
-        let filemgr = NSFileManager.defaultManager()
-        if filemgr.fileExistsAtPath(projectDir, isDirectory:&isDir) {
-            if isDir {
-                projectDirectoryNotFoundMsg.hidden = true
-                projectTerminalButton.enabled = true
-                projectFinderButton.enabled = true
-            }
-            else {
-                projectDirectoryNotFoundMsg.hidden = false
-                projectTerminalButton.enabled = false
-                projectFinderButton.enabled = false
-            }
+        if showProjectTab {
+            projectDirectoryNotFoundMsg.hidden = true
+            projectTerminalButton.enabled = true
+            projectFinderButton.enabled = true
         }
         else {
             projectDirectoryNotFoundMsg.hidden = false
             projectTerminalButton.enabled = false
             projectFinderButton.enabled = false
         }
-
-        self.devContainers.string = "Hi there"
         
+        self.devContainers.string = ""
         
-        //    let text:String
-        //    // 1
-        //    let itemsSelected = tableView.selectedRowIndexes.count
-        //
-        //    // 2
-        //    if ( directoryItems == nil ) {
-        //        text = ""
-        //    }
-        //    else if( itemsSelected == 0 ) {
-        //        text =   "\(directoryItems!.count) items"
-        //    }
-        //    else
-        //    {
-        //        text = "\(itemsSelected) of \(directoryItems!.count) selected"
-        //    }
-        //    // 3
-        //    statusLabel.stringValue = text
-        
+        // Get a list of containers
         dockerPs()
         
     }
-    
-    //--------------------------------------------------
-    //          Get Docker status
-    //--------------------------------------------------
+}
+
+// MARK: -
+// MARK:         Docker containers
+// MARK: -
+extension ViewController {
+
     func dockerPs() {
         print("dockerPs()")
         
@@ -364,15 +371,15 @@ extension ViewController : NSTableViewDelegate {
             //2.
             self.buildTask = NSTask()
             self.buildTask.launchPath = path
-//            self.buildTask.arguments = arguments
+            //            self.buildTask.arguments = arguments
             
             //3.
             self.buildTask.terminationHandler = {
                 
                 task in
                 dispatch_async(dispatch_get_main_queue(), {
-//                    self.buildButton.enabled = true
-//                    self.spinner.stopAnimation(self)
+                    //                    self.buildButton.enabled = true
+                    //                    self.spinner.stopAnimation(self)
                     self.psRunning = false
                 })
                 
@@ -388,7 +395,7 @@ extension ViewController : NSTableViewDelegate {
         }
     }
 
-    
+
     func captureStandardOutputAndRouteToTextView(task:NSTask) {
         
         //1.
@@ -409,14 +416,14 @@ extension ViewController : NSTableViewDelegate {
             
             //5.
             dispatch_async(dispatch_get_main_queue(), {
-//                let previousOutput = self.outputText.string ?? ""
+                //                let previousOutput = self.outputText.string ?? ""
                 let previousOutput = self.devContainers.string ?? ""
                 let nextOutput = previousOutput + "\n" + outputString
-//                self.outputText.string = nextOutput
+                //                self.outputText.string = nextOutput
                 self.devContainers.string = nextOutput
                 
                 let range = NSRange(location:nextOutput.characters.count,length:0)
-//                self.outputText.scrollRangeToVisible(range)
+                //                self.outputText.scrollRangeToVisible(range)
                 self.devContainers.scrollRangeToVisible(range)
                 
             })
@@ -425,5 +432,4 @@ extension ViewController : NSTableViewDelegate {
             self.outputPipe.fileHandleForReading.waitForDataInBackgroundAndNotify()
         }
     }
-
 }

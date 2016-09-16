@@ -12,6 +12,6 @@ export DOCKER_CERT_PATH=${HOME}/.docker/machine/machines/default
 
 date > /tmp/,dockerPS.command
 
-/usr/local/bin/docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}' | awk '{ printf "%-20s %-40s %-s\n", $1, $2, $3 }'
+/usr/local/bin/docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}' | awk -F $'\t' '{ printf "%-20s %-40s %-s\n", $1, $2, $3 }'
 exit 0
 
