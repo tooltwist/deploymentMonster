@@ -10,8 +10,13 @@ export DOCKER_HOST=tcp://192.168.99.100:2376
 export DOCKER_TLS_VERIFY=1
 export DOCKER_CERT_PATH=${HOME}/.docker/machine/machines/default
 
-date > /tmp/,dockerPS.sh
 
-/usr/local/bin/docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}' | awk -F $'\t' '{ printf "%-25s %-40s %-s\n", $1, $2, $3 }'
+/usr/local/bin/docker ps --all --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' \
+    | awk -F $'|' '{
+        gsub(/0.0.0.0:/, "", $4)
+        gsub(/\/tcp/, "", $4)
+        printf "%s|%s|%s|%s\n", $1, $2, $3, $4
+    }'
+
 exit 0
 

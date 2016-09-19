@@ -10,16 +10,138 @@ import Cocoa
 
 struct Project {
     var name = ""
-    var dev = false
-    var devDirectory = ""
+    
+    // For each mode:
+    //      - Is it defined? (i.e. has a directory)
+    //      - directory path
+    //      - what prefix is used for it's docker containers
+    //      - how many containers are currently running
+    var dev: Bool
+    var devDirectory: String
+    var devPrefix: String? = nil
+//    var devContainersRunning: Int
+//    var devContainersStopped: Int
+    
+    var dockerize = false
+    var dockerizeDirectory: String
+    
     var test = false
-    var testDirectory = ""
-    var docker = false
-    var dockerDirectory = ""
+    var testDirectory: String
+    var testPrefix: String? = nil
+//    var testContainersRunning = 0
+//    var testContainersStopped = 0
+
+    var devall: Bool
+    var devallDirectory: String
+    var devallPrefix: String? = nil
+//    var devallContainersRunning: Int
+//    var devallContainersStopped: Int
+
+    
+    init(name: String, configsDirectory: String) {
+        self.name = name
+
+//        self.devDirectory = devDirectory
+//        self.dev = (devDirectory != nil)
+//        self.devPrefix = self.findPrefix(devDirectory)
+//        self.devContainers = 0
+        
+        
+        
+        let filemgr = NSFileManager.defaultManager()
+        var isDir : ObjCBool = false
+
+        // dev
+        self.dev = false
+        self.devDirectory = configsDirectory + "/dev"
+        if filemgr.fileExistsAtPath(self.devDirectory, isDirectory:&isDir) {
+            if isDir {
+                self.dev = true
+            }
+        }
+//        self.devContainersRunning = 0
+//        self.devContainersStopped = 0
+        
+        // dockerize
+        self.dockerize = false
+        self.dockerizeDirectory = configsDirectory + "/dockerize"
+        if filemgr.fileExistsAtPath(self.dockerizeDirectory, isDirectory:&isDir) {
+            if isDir {
+                self.dockerize = true
+            }
+        }
+        
+        // test
+        self.test = false
+        self.testDirectory = configsDirectory + "/test"
+        if filemgr.fileExistsAtPath(self.testDirectory, isDirectory:&isDir) {
+            if isDir {
+                self.test = true
+            }
+        }
+//        self.devContainersRunning = 0
+//        self.devContainersStopped = 0
+        
+        // dev-all
+        self.devall = false
+        self.devallDirectory = configsDirectory + "/devall"
+        if filemgr.fileExistsAtPath(self.devallDirectory, isDirectory:&isDir) {
+            if isDir {
+                self.devall = true
+            }
+        }
+//        self.devallContainersRunning = 0
+//        self.devallContainersStopped = 0
+
+        // Load from properties files (if they exist)
+        self.devPrefix = self.findPrefix(devDirectory)
+        self.testPrefix = self.findPrefix(testDirectory)
+        self.devallPrefix = self.findPrefix(devallDirectory)
+    }
+    
+    func findPrefix(directory: String?) -> String? {
+        if directory == nil { return nil }
+        
+        
+        // See if a properties file exists
+        let path = directory! + "/.deploymentMonster"
+        let filemgr = NSFileManager.defaultManager()
+        if filemgr.fileExistsAtPath(path) {
+            
+            
+            let jsonData = NSData(contentsOfFile: path)
+            do {
+                let jsonResult = try NSJSONSerialization.JSONObjectWithData(jsonData!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
+
+                let prefix : String = (jsonResult!["prefix"] as? String)!
+                
+                print("prefix is \(prefix)")
+                return prefix
+            }
+            catch let error as NSError { print(error.localizedDescription); }
+        }
+        return nil
+    }
+    
+    /**
+     *      Return the prefix of containers for a specific mode (dev, test, devall)
+     */
+    func prefixForMode(mode: String) -> String? {
+        if mode == "dev" {
+            return self.devPrefix
+        }
+        if mode == "test" {
+            return self.testPrefix
+        }
+        if mode == "devall" {
+            return self.devallPrefix
+        }
+        return nil
+    }
 }
 
 /*
- * Load projects from teh config directory
+ * Load projects from the config directory
  */
 func loadProjects() -> [Project] {
     
@@ -61,10 +183,6 @@ func loadProjects() -> [Project] {
     
     do {
         let filelist = try filemgr.contentsOfDirectoryAtPath(configDir)
-        
-//        let fileManager = FileManager.default
-        
-        
         for filename in filelist {
             print(filename)
             
@@ -79,36 +197,8 @@ func loadProjects() -> [Project] {
             var isDir : ObjCBool = false
             if filemgr.fileExistsAtPath(fullPath, isDirectory:&isDir) {
                 if isDir {
-                    
-                    var dev = false
-                    let devDir = fullPath + "/dev"
-                    if filemgr.fileExistsAtPath(devDir, isDirectory:&isDir) {
-                        if isDir {
-                            dev = true
-                        }
-                    }
-                    var test = false
-                    let testDir = fullPath + "/test"
-                    if filemgr.fileExistsAtPath(testDir, isDirectory:&isDir) {
-                        if isDir {
-                            test = true
-                        }
-                    }
-                    var dockerize = false
-                    let dockerDir = fullPath + "/dockerize"
-                    if filemgr.fileExistsAtPath(dockerDir, isDirectory:&isDir) {
-                        if isDir {
-                            dockerize = true
-                        }
-                    }
-
-                    list.append(Project(name: filename,
-                        dev: dev,
-                        devDirectory: devDir,
-                        test: test,
-                        testDirectory: testDir,
-                        docker: dockerize,
-                        dockerDirectory: dockerDir))
+                    let project = Project(name: filename, configsDirectory: fullPath)
+                    list.append(project)
                 }
             }
         }
